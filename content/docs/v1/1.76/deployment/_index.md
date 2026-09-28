@@ -372,6 +372,17 @@ To learn more about rollover index management in Jaeger refer to this
 [article](https://medium.com/jaegertracing/using-elasticsearch-rollover-to-manage-indices-8b3d0c77915d).
 
 For automated rollover, please refer to [Elasticsearch ILM support](#elasticsearch-ilm-support).
+
+The following index-management strategies are available:
+
+| Strategy | Rollover criteria | Cleanup | Tradeoffs |
+| --- | --- | --- | --- |
+| Manual rollover with `jaeger-es-rollover` and `jaeger-es-index-cleaner` | Time, size, or document count | Run `lookback` and/or `jaeger-es-index-cleaner` CronJobs | Tried and tested, but requires CronJob setup and maintenance |
+| Elasticsearch ILM | Time, size, or document count | Managed by Elasticsearch ILM | Requires Elasticsearch 7.x; experimental in Jaeger 1.x; requires an ILM policy and correctly configured aliases and templates |
+| Time-based indices | Day or hour only | Run `jaeger-es-index-cleaner` separately | Simplest setup, but cleanup of old indices remains your responsibility |
+
+Choose one strategy. Do not run the manual rollover CronJobs when ILM is managing rollover and retention.
+
 ##### Initialize
 
 The following command prepares Elasticsearch for rollover deployment by creating index aliases, indices, and index templates:
